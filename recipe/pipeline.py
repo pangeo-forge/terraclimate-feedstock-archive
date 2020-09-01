@@ -205,6 +205,4 @@ class TerraclimatePipeline(AbstractPipeline):
         return _flow
 
 
-pipeline = TerraclimatePipeline(
-    cache_location, target_location, variables, years
-)
+pipeline = TerraclimatePipeline(cache_location, target_location, variables, years)
