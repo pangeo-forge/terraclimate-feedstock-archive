@@ -14,8 +14,8 @@ def main():
     print(pipeline.flow.environment)
     print(pipeline.flow.parameters)
     print(pipeline.flow.sorted_tasks())
-
-    # pipeline.flow.run()
+    print("Registering Flow")
+    pipeline.flow.register(project_name="pangeo-forge")
 
 
 if __name__ == "__main__":

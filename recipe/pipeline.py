@@ -5,30 +5,34 @@ from numcodecs import Blosc
 from pangeo_forge.pipelines.base import AbstractPipeline
 from pangeo_forge.tasks.http import download
 from prefect import Flow, task
+from prefect.environments import DaskKubernetesEnvironment
+from prefect.environments.storage import Docker
+
 
 # options
 name = "terraclimate"
 chunks = {"lat": 1024, "lon": 1024, "time": 12}
-years = list(range(1958, 2020))
-cache_location = f"gs://carbonplan-scratch/{name}-cache/"
-target_location = f"gs://carbonplan-data/raw/{name}-from-hdf5/4000m/raster.zarr"
+# years = list(range(1958, 2020))
+years = list(range(1958, 1960))
+cache_location = f"gs://pangeo-scratch/{name}-cache/"
+target_location = f"gs://pangeo-scratch/raw/{name}-from-hdf5/4000m/raster.zarr"
 
 
 variables = [
     "aet",
-    "def",
-    "pet",
-    "ppt",
-    "q",
-    "soil",
-    "srad",
-    "swe",
-    "tmax",
-    "tmin",
-    "vap",
-    "ws",
-    "vpd",
-    "PDSI",
+    # "def",
+    # "pet",
+    # "ppt",
+    # "q",
+    # "soil",
+    # "srad",
+    # "swe",
+    # "tmax",
+    # "tmin",
+    # "vap",
+    # "ws",
+    # "vpd",
+    # "PDSI",
 ]
 
 mask_opts = {
@@ -184,6 +188,29 @@ class TerraclimatePipeline(AbstractPipeline):
         return [self.target_location]
 
     @property
+    def environment(self):
+        environment = DaskKubernetesEnvironment(
+            min_workers=1, max_workers=30,
+            scheduler_spec_file="recipe/job.yaml",
+            worker_spec_file="recipe/worker_pod.yaml",
+        )
+        return environment
+
+    @property
+    def storage(self):
+        storage = Docker(
+            "tomaugspurger",
+            dockerfile="recipe/Dockerfile",
+            prefect_directory="/home/jovyan/prefect",
+            python_dependencies=[
+                "git+https://github.com/pangeo-forge/pangeo-forge@master",
+                "prefect==0.13.4",
+            ],
+            image_tag="latest",
+        )
+        return storage
+
+    @property
     def flow(self):
 
         if len(self.targets) == 1:
@@ -191,7 +218,7 @@ class TerraclimatePipeline(AbstractPipeline):
         else:
             raise ValueError("Zarr target requires self.targets be a length one list")
 
-        with Flow(self.name) as _flow:
+        with Flow(self.name, storage=self.storage, environment=self.environment) as _flow:
 
             # download to cache
             nc_sources = [download(k, self.cache_location) for k in self.sources]
@@ -206,3 +233,15 @@ class TerraclimatePipeline(AbstractPipeline):
 
 
 pipeline = TerraclimatePipeline(cache_location, target_location, variables, years)
+
+
+if __name__ == "__main__":
+    pipeline.flow.validate()
+
+    print(pipeline.flow)
+    print(pipeline.flow.environment)
+    print(pipeline.flow.parameters)
+    print(pipeline.flow.sorted_tasks())
+    print("Registering Flow")
+    pipeline.flow.register(project_name="pangeo-forge")
+
