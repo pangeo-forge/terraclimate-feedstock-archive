@@ -122,21 +122,55 @@ def get_encoding(ds):
 
 
 @task
+def download(source_url, cache_location):
+    """
+    Download a remote file to a cache.
+    Parameters
+    ----------
+    source_url : str
+        Path or url to the source file.
+    cache_location : str
+        Path or url to the target location for the source file.
+    Returns
+    -------
+    target_url : str
+        Path or url in the form of `{cache_location}/hash({source_url})`.
+    """
+    fs = fsspec.get_filesystem_class(cache_location.split(':')[0])(token='cloud')
+
+    target_url = os.path.join(cache_location, str(hash(source_url)))
+
+    # there is probably a better way to do caching!
+    try:
+        fs.open(target_url)
+        return target_url
+    except FileNotFoundError:
+        pass
+
+    with fs.open(source_url, mode="rb") as source:
+        with fs.open(target_url, mode="wb") as target:
+            target.write(source.read())
+    return target_url
+
+
+@task
 def nc2zarr(source_url, cache_location):
     """convert netcdf data to zarr"""
+    fs = fsspec.get_filesystem_class(source_url.split(':')[0])(token='cloud')
+
     target_url = source_url + ".zarr"
 
     with dask.config.set(scheduler="single-threaded"):
 
         ds = (
-            xr.open_dataset(fsspec.open(source_url).open())
+            xr.open_dataset(fs.open(source_url))
             .pipe(preproc)
             .pipe(postproc)
             .load()
             .chunk(chunks)
         )
 
-        mapper = fsspec.get_mapper(target_url)
+        mapper = fs.get_mapper(target_url)
         ds.to_zarr(mapper)
 
     return target_url
