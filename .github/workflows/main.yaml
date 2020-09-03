@@ -9,9 +9,9 @@ jobs:
     name: Pangeo-Forge CI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.2
+      - uses: actions/checkout@v2.3.1
       - name: Setup Python
-        uses: actions/setup-python@v2.1.2
+        uses: actions/setup-python@v2.1.0
         with:
           python-version: 3.7
           architecture: x64
@@ -20,5 +20,6 @@ jobs:
             python -m pip install -r requirements.txt
       - name: Run Pipeline
         run: |
-            # stand in for pangeo-smithy runner
-            python run.py
+            python recipe/pipeline.py
+            prefect auth login --token ${{ secrets.PREFECT_ACCESS_TOKEN }}
+            prefect run flow --name=terraclimate --project=pangeo-forge

@@ -20,7 +20,7 @@ target_location = f"gs://pangeo-scratch/raw/{name}-from-hdf5/4000m/raster.zarr"
 
 variables = [
     "aet",
-    # "def",
+    "def",
     # "pet",
     # "ppt",
     # "q",
