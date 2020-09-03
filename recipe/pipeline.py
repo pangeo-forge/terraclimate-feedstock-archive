@@ -192,7 +192,7 @@ def combine_and_write(sources, target):
     mappers = [fsspec.get_mapper(url) for url in sources]
     ds_list = [xr.open_zarr(mapper) for mapper in mappers]
 
-    ds = xr.concat(ds_list, dim="time")
+    ds = xr.combine_by_coords(ds_list)
 
     mapper = fsspec.get_mapper(target)
     ds.to_zarr(mapper, mode="w", consolidated=True)
