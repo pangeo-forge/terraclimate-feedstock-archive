@@ -199,7 +199,7 @@ class TerraclimatePipeline(AbstractPipeline):
     @property
     def storage(self):
         storage = Docker(
-            "tomaugspurger",
+            "pangeoforge",
             dockerfile="recipe/Dockerfile",
             prefect_directory="/home/jovyan/prefect",
             python_dependencies=[

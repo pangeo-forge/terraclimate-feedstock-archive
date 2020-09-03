@@ -5,5 +5,5 @@ RUN apt-get update -y && \
     apt-get install -y tzdata
 USER ${NB_USER}
 ENV PATH=/srv/conda/envs/notebook/bin:$PATH
-ENV JUPYTERHUB_USER=tomaugspurger
+ENV JUPYTERHUB_USER=pangeoforge
 
