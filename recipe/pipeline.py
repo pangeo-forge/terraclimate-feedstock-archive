@@ -148,7 +148,7 @@ def download(source_url, cache_location):
     except FileNotFoundError:
         pass
 
-    with fs.open(source_url, mode="rb") as source:
+    with fsspec.open(source_url, mode="rb") as source:
         with fs.open(target_url, mode="wb") as target:
             target.write(source.read())
     return target_url
