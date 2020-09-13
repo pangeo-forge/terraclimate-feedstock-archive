@@ -13,8 +13,8 @@ from prefect.environments.storage import Docker
 # options
 name = "terraclimate"
 chunks = {"lat": 1024, "lon": 1024, "time": 12}
-# years = list(range(1958, 2020))
-years = list(range(1958, 1960))
+years = list(range(1958, 2020))
+# years = list(range(1958, 1960))
 cache_location = f"gs://pangeo-scratch/{name}-cache/"
 target_location = f"gs://pangeo-scratch/raw/{name}-from-hdf5/4000m/raster.zarr"
 
@@ -22,19 +22,21 @@ target_location = f"gs://pangeo-scratch/raw/{name}-from-hdf5/4000m/raster.zarr"
 variables = [
     "aet",
     "def",
-    # "pet",
-    # "ppt",
-    # "q",
-    # "soil",
-    # "srad",
-    # "swe",
-    # "tmax",
-    # "tmin",
-    # "vap",
-    # "ws",
-    # "vpd",
-    # "PDSI",
+    "pet",
+    "ppt",
+    "q",
+    "soil",
+    "srad",
+    "swe",
+    "tmax",
+    "tmin",
+    "vap",
+    "ws",
+    "vpd",
+    "PDSI",
 ]
+
+rename_vars = {'PDSI': 'pdsi'}
 
 mask_opts = {
     "PDSI": ("lt", 10),
@@ -79,6 +81,9 @@ def preproc(ds):
         ds = ds.drop_vars("station_influence")
 
     var = list(ds.data_vars)[0]
+
+    if var in rename_vars:
+        rename[var] = rename_vars[var]
 
     if "day" in ds.coords:
         rename["day"] = "time"
@@ -172,7 +177,7 @@ def nc2zarr(source_url, cache_location):
         )
 
         mapper = fs.get_mapper(target_url)
-        ds.to_zarr(mapper)
+        ds.to_zarr(mapper, mode='w')
 
     return target_url
 
