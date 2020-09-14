@@ -15,8 +15,8 @@ name = "terraclimate"
 chunks = {"lat": 1024, "lon": 1024, "time": 12}
 years = list(range(1958, 2020))
 # years = list(range(1958, 1960))
-cache_location = f"gs://pangeo-scratch/{name}-cache/"
-target_location = f"gs://pangeo-scratch/raw/{name}-from-hdf5/4000m/raster.zarr"
+cache_location = f"gs://pangeo-forge-scratch/{name}-cache/"
+target_location = f"gs://pangeo-forge-scratch/{name}.zarr"
 
 
 variables = [
