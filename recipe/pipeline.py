@@ -244,7 +244,7 @@ class TerraclimatePipeline(AbstractPipeline):
             prefect_directory="/home/jovyan/prefect",
             python_dependencies=[
                 "git+https://github.com/pangeo-forge/pangeo-forge@master",
-                "prefect==0.13.4",
+                "prefect==0.13.6",
             ],
             image_tag="latest",
         )
