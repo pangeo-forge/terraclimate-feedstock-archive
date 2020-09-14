@@ -23,7 +23,7 @@ anywhere.
 
 1. Add a ServiceAccount
 
-This needs to have read / write access to pangeo-scratch (like `pangeo`) *and* have the ability to start / stop pods for dask-kubernetes. We don't want to give the `pangeo` SA permissions to read / write, so we'll make a new one.
+This needs to have read / write access to pangeo-forge-scratch (like `pangeo`) *and* have the ability to start / stop pods for dask-kubernetes. We don't want to give the `pangeo` SA permissions to read / write, so we'll make a new one.
 
 ```console
 $ kubectl apply -f daskkubernetes.yaml
@@ -35,7 +35,7 @@ rolebinding.rbac.authorization.k8s.io/pangeo-forge created
 2. Create a GSA
 
 ```
-$ gcloud iam service-accounts create pangeo-forge --display-name=pangeo-forge --description="GSA for pangeo-forge. Grant read / write access to gcs://pangeo-scratch."
+$ gcloud iam service-accounts create pangeo-forge --display-name=pangeo-forge --description="GSA for pangeo-forge. Grant read / write access to gcs://pangeo-forge-scratch."
 Created service account [pangeo-forge].
 ```
 
