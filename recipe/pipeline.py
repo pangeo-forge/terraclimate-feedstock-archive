@@ -14,8 +14,8 @@ from prefect.environments.storage import Docker
 # options
 name = "terraclimate"
 chunks = {"lat": 1024, "lon": 1024, "time": 12}
-years = list(range(1958, 2020))
-# years = list(range(1958, 1960))
+# years = list(range(1958, 2020))
+years = list(range(1958, 1960))
 cache_location = f"gs://pangeo-forge-scratch/{name}-cache/"
 target_location = f"gs://pangeo-forge-scratch/{name}.zarr"
 
@@ -23,18 +23,18 @@ target_location = f"gs://pangeo-forge-scratch/{name}.zarr"
 variables = [
     "aet",
     "def",
-    "pet",
-    "ppt",
-    "q",
-    "soil",
-    "srad",
-    "swe",
-    "tmax",
-    "tmin",
-    "vap",
-    "ws",
-    "vpd",
-    "PDSI",
+    # "pet",
+    # "ppt",
+    # "q",
+    # "soil",
+    # "srad",
+    # "swe",
+    # "tmax",
+    # "tmin",
+    # "vap",
+    # "ws",
+    # "vpd",
+    # "PDSI",
 ]
 
 rename_vars = {'PDSI': 'pdsi'}
