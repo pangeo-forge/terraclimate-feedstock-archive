@@ -1,5 +1,7 @@
-from typing import List
 import os
+from datetime import timedelta
+from typing import List
+
 import dask
 import fsspec
 import xarray as xr
@@ -10,13 +12,12 @@ from prefect import Flow, task, unmapped
 from prefect.environments import DaskKubernetesEnvironment
 from prefect.environments.storage import Docker
 
-
 # options
 name = "terraclimate"
 chunks = {"lat": 1024, "lon": 1024, "time": 12}
 # years = list(range(1958, 2020))
 years = list(range(1958, 1960))
-cache_location = f"gs://pangeo-forge-scratch/{name}-cache/"
+cache_location = f"gs://pangeo-forge-scratch/{name}-cache-2/"
 target_location = f"gs://pangeo-forge-scratch/{name}.zarr"
 
 
@@ -128,7 +129,7 @@ def get_encoding(ds):
     return encoding
 
 
-@task
+@task(max_retries=1, retry_delay=timedelta(seconds=1))
 def download(source_url: str, cache_location: str) -> str:
     """
     Download a remote file to a cache.
@@ -160,7 +161,7 @@ def download(source_url: str, cache_location: str) -> str:
     return target_url
 
 
-@task
+@task(max_retries=1, retry_delay=timedelta(seconds=10))
 def nc2zarr(source_url: str, cache_location: str) -> str:
     """convert netcdf data to zarr"""
     fs = fsspec.get_filesystem_class(source_url.split(':')[0])(token='cloud')
