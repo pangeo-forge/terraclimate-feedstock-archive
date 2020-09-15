@@ -14,8 +14,8 @@ spec:
       serviceAccount: pangeo-forge
       containers:
         - name: flow
-          image: prefecthq/prefect:latest
-          imagePullPolicy: IfNotPresent
+          image: pangeoforge/terraclimate
+          imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
           args:
             [
