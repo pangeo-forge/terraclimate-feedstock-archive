@@ -1,3 +1,4 @@
+from typing import List
 import os
 import dask
 import fsspec
@@ -5,7 +6,7 @@ import xarray as xr
 from numcodecs import Blosc
 from pangeo_forge.pipelines.base import AbstractPipeline
 from pangeo_forge.tasks.http import download
-from prefect import Flow, task
+from prefect import Flow, task, unmapped
 from prefect.environments import DaskKubernetesEnvironment
 from prefect.environments.storage import Docker
 
@@ -128,7 +129,7 @@ def get_encoding(ds):
 
 
 @task
-def download(source_url, cache_location):
+def download(source_url: str, cache_location: str) -> str:
     """
     Download a remote file to a cache.
     Parameters
@@ -160,7 +161,7 @@ def download(source_url, cache_location):
 
 
 @task
-def nc2zarr(source_url, cache_location):
+def nc2zarr(source_url: str, cache_location: str) -> str:
     """convert netcdf data to zarr"""
     fs = fsspec.get_filesystem_class(source_url.split(':')[0])(token='cloud')
 
@@ -183,7 +184,7 @@ def nc2zarr(source_url, cache_location):
 
 
 @task
-def combine_and_write(sources, target):
+def combine_and_write(sources: List[str], target: str):
     """
     Combine one or more source datasets into a single `Xarray.Dataset`, then
     write them to a Zarr store.
@@ -260,10 +261,16 @@ class TerraclimatePipeline(AbstractPipeline):
 
         with Flow(self.name, storage=self.storage, environment=self.environment) as _flow:
             # download to cache
-            nc_sources = download.map(self.sources, cache_location=self.cache_location)
+            nc_sources = download.map(
+                self.sources,
+                cache_location=unmapped(self.cache_location),
+            )
 
             # convert cached netcdf data to zarr
-            cached_sources = nc2zarr.map(nc_sources, cache_location=self.cache_location)
+            cached_sources = nc2zarr.map(
+                nc_sources,
+                cache_location=unmapped(self.cache_location),
+            )
 
             # combine all datasets into a single zarr archive
             combine_and_write(cached_sources, target)
