@@ -259,12 +259,11 @@ class TerraclimatePipeline(AbstractPipeline):
             raise ValueError("Zarr target requires self.targets be a length one list")
 
         with Flow(self.name, storage=self.storage, environment=self.environment) as _flow:
-
             # download to cache
-            nc_sources = [download(k, self.cache_location) for k in self.sources]
+            nc_sources = download.map(self.sources, cache_location=self.cache_location)
 
             # convert cached netcdf data to zarr
-            cached_sources = [nc2zarr(k, self.cache_location) for k in nc_sources]
+            cached_sources = nc2zarr.map(nc_sources, cache_location=self.cache_location)
 
             # combine all datasets into a single zarr archive
             combine_and_write(cached_sources, target)
