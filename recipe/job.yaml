@@ -15,7 +15,7 @@ spec:
       containers:
         - name: flow
           image: pangeoforge/terraclimate
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
           args:
             [

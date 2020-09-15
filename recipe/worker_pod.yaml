@@ -8,7 +8,7 @@ spec:
   serviceAccount: pangeo-forge
   containers:
   - image: pangeoforge/terraclimate
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
     args: [dask-worker, --no-bokeh, --death-timeout, '60']
     name: dask-worker
     env:
