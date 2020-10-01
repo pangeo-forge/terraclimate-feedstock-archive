@@ -9,7 +9,7 @@ jobs:
     name: Pangeo-Forge CI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v2.3.3
       - name: Setup Python
         uses: actions/setup-python@v2.1.0
         with:
